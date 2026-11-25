@@ -1,0 +1,115 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <limits>
+using namespace std;
+
+struct Person
+{
+    string name;
+    int age;
+};
+
+int main()
+{
+    int n;
+
+    cout << "Enter number of persons: ";
+    cin >> n;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    // Step 1: Save persons in file
+
+    ofstream out("persons.txt");
+
+    for (int i = 0; i < n; i++)
+    {
+        Person p;
+
+        cout << "Enter name: ";
+        getline(cin, p.name);
+
+        cout << "Enter age: ";
+        cin >> p.age;
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        out << p.name << endl;
+        out << p.age << endl;
+    }
+
+    out.close();
+
+    // Step 2: Read data into vector
+
+    vector<Person> persons;
+
+    ifstream in("persons.txt");
+
+    Person p;
+
+    while (getline(in, p.name))
+    {
+        if (in >> p.age)
+        {
+            persons.push_back(p);
+            in.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
+
+    in.close();
+
+    // Find younger and older persons
+
+    if (persons.empty())
+    {
+        cout << "No persons found";
+        return 0;
+    }
+
+    int minAge = persons[0].age;
+    int maxAge = persons[0].age;
+
+    for (int i = 1; i < persons.size(); i++)
+    {
+        if (persons[i].age < minAge)
+            minAge = persons[i].age;
+
+        if (persons[i].age > maxAge)
+            maxAge = persons[i].age;
+    }
+
+    // Save results
+
+    ofstream result("results.txt");
+
+    result << "Younger persons:\n";
+
+    for (int i = 0; i < persons.size(); i++)
+    {
+        if (persons[i].age == minAge)
+        {
+            result << persons[i].name
+                   << " - " << persons[i].age << endl;
+        }
+    }
+
+    result << "\nOlder persons:\n";
+
+    for (int i = 0; i < persons.size(); i++)
+    {
+        if (persons[i].age == maxAge)
+        {
+            result << persons[i].name
+                   << " - " << persons[i].age << endl;
+        }
+    }
+
+    result.close();
+
+    cout << "Results saved successfully";
+
+    return 0;
+}

@@ -1,0 +1,113 @@
+
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+using namespace std;
+
+int main()
+{
+    int grade;
+
+    // Step 1: Create file and write 5 grades
+    ofstream out("grades.txt");
+
+    if (!out)
+    {
+        cout << "Unable to create file";
+        return 1;
+    }
+
+    cout << "Enter 5 grades:" << endl;
+
+    for (int i = 0; i < 5; i++)
+    {
+        cin >> grade;
+        out << grade << endl;
+    }
+
+    out.close();
+
+    // Step 2: Read and print grades
+    ifstream in("grades.txt");
+
+    if (!in)
+    {
+        cout << "Unable to open file";
+        return 1;
+    }
+
+    cout << "\nGrades before deletion:" << endl;
+
+    while (in >> grade)
+    {
+        cout << grade << endl;
+    }
+
+    in.close();
+
+    // Step 3: Delete a grade using temporary file
+    int deleteGrade;
+    cout << "\nEnter grade to delete: ";
+    cin >> deleteGrade;
+
+    ifstream original("grades.txt");
+    ofstream temp("temp.txt");
+
+    if (!original || !temp)
+    {
+        cout << "File error";
+        return 1;
+    }
+
+    bool found = false;
+
+    while (original >> grade)
+    {
+        if (grade != deleteGrade)
+        {
+            temp << grade << endl;
+        }
+        else
+        {
+            found = true;
+        }
+    }
+
+    original.close();
+    temp.close();
+
+    // Step 4: Replace original file
+    if (found)
+    {
+        remove("grades.txt");
+
+        if (rename("temp.txt", "grades.txt") == 0)
+        {
+            cout << "\nGrade deleted successfully!" << endl;
+        }
+        else
+        {
+            cout << "\nError replacing file" << endl;
+            return 1;
+        }
+    }
+    else
+    {
+        remove("temp.txt");
+        cout << "\nGrade not found!" << endl;
+    }
+
+    // Print grades after deletion
+    ifstream finalFile("grades.txt");
+
+    cout << "\nGrades after deletion:" << endl;
+
+    while (finalFile >> grade)
+    {
+        cout << grade << endl;
+    }
+
+    finalFile.close();
+
+    return 0;
+}
